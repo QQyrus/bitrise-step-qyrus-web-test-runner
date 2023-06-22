@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const https = require('https')
+const https = require('http')
 const http = require('http')
 const request = require('request')
 const path = require('path')
 const url = require('url')
 const { exec } = require("child_process");
+
 
 let appPath = process.argv[2];
 let gatewayUrl = process.argv[3]
@@ -15,12 +16,20 @@ let qyrus_password = process.argv[5];
 let qyrus_team_name = process.argv[6];
 let qyrus_project_name = process.argv[7];
 let qyrus_suite_name = process.argv[8];
-let app_activity = process.argv[9];
-let device_pool_name = process.argv[10];
-let upload_app = process.argv[11];
-let enable_debug = process.argv[12];
-let bundle_id = process.argv[13];
-let emailId = process.argv[14];
+let variableName = process.argv[9];
+let OperatingSystem = process.argv[10];
+let emailId = process.argv[11];
+let browser = process.argv[12];
+let app_activity = process.argv[13];
+let onErrorContinue = process.argv[14];
+let bundle_id = process.argv[15];
+let enable_debug = process.argv[16];
+let upload_app = process.argv[17];
+
+const gatewayURLParse = new URL(gatewayUrl);
+let host_name = gatewayURLParse.hostname;
+let port = gatewayURLParse.port;
+let pathName = gatewayURLParse.pathname;
 
 // testing parameters
 if ( appPath == null || qyrus_username == null || qyrus_password == null || appPath == null || gatewayUrl == null ) {
@@ -44,13 +53,15 @@ if ( enable_debug == 'yes' ) {
     console.log('Team Name :',qyrus_team_name);
     console.log('Project Name :',qyrus_project_name);
     console.log('Suite Name :',qyrus_suite_name);
-    console.log('App Activity :',app_activity);
-    console.log('Bundle ID :',bundle_id);
-    console.log('Device Pool Name :',device_pool_name);
+    console.log('variableEnvironmentId :',variableName);
+    console.log('OperatingSystem :',OperatingSystem);
+    console.log('onErrorContinue :',onErrorContinue);
+    console.log('emailId :',emailId);
     console.log('Host Name :',host_name);
     console.log('Port :',port);
     console.log('Path Name :',pathName);
     console.log('Upload App :',upload_app);
+    console.log('Browser :',browser);
 }
 
 var appName = '';
@@ -93,24 +104,24 @@ function runTrigger ( ) {
     let apiCallConfig = {
         host: host_name,
         port: port,
-        path: pathName+'/mobilityTrigger',
+        path: pathName+'/webrepoAutomationTrigger',
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         }
     }
+    
     let testObject = {
         "userName": qyrus_username,
         "encodedPassword": qyrus_password,
         "teamName": qyrus_team_name,
-        "projectName": qyrus_project_name,
-        "testSuiteName": qyrus_suite_name,
-        "devicePoolName": device_pool_name,
-        "appFileName": appName,
-        "appPackage" : appPackage,
-        "appActivity": app_activity,
-        "bundleId": bundle_id,
-        "emailId" : emailId
+        "project": qyrus_project_name,
+        "testSuite": qyrus_suite_name,
+        "operatingSystem": OperatingSystem,
+        "browser": browser,
+        "onErrorContinue": onErrorContinue,
+        "variableEnvironmentId": variableName
+
     }
     var reqPost = https.request ( apiCallConfig, function(response) {
         if (response.statusCode != 200) {
@@ -189,7 +200,6 @@ function completedTest (execStatusResponse) {
         }
     }
     var reqPost = https.request(apiCallConfig, function(response) {
-       
         if(response.statusCode!=200){
             console.log('Failed to run test, Try again.');
             return;
