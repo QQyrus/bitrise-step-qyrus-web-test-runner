@@ -8,23 +8,18 @@ const path = require('path')
 const url = require('url')
 const { exec } = require("child_process");
 
-
-let appPath = process.argv[2];
-let gatewayUrl = process.argv[3]
-let qyrus_username = process.argv[4];
-let qyrus_password = process.argv[5];
-let qyrus_team_name = process.argv[6];
-let qyrus_project_name = process.argv[7];
-let qyrus_suite_name = process.argv[8];
-let variableName = process.argv[9];
-let OperatingSystem = process.argv[10];
-let emailId = process.argv[11];
-let browser = process.argv[12];
-let app_activity = process.argv[13];
-let onErrorContinue = process.argv[14];
-let bundle_id = process.argv[15];
-let enable_debug = process.argv[16];
-let upload_app = process.argv[17];
+let gatewayUrl = process.argv[2]
+let qyrus_username = process.argv[3];
+let qyrus_password = process.argv[4];
+let qyrus_team_name = process.argv[5];
+let qyrus_project_name = process.argv[6];
+let qyrus_suite_name = process.argv[7];
+let variableName = process.argv[8];
+let OperatingSystem = process.argv[9];
+let emailId = process.argv[10];
+let browser = process.argv[11];
+let onErrorContinue = process.argv[12];
+let enable_debug = process.argv[13];
 
 const gatewayURLParse = new URL(gatewayUrl);
 let host_name = gatewayURLParse.hostname;
@@ -37,17 +32,12 @@ if ( appPath == null || qyrus_username == null || qyrus_password == null || appP
     process.exitCode = 1;
 }
 
-if ( app_activity == null ) {
-    app_activity = '';
-}
-
-if ( bundle_id == null ) {
-    bundle_id = '';
+if ( variableName == null ) {
+    variableName = 'Global';
 }
 
 if ( enable_debug == 'yes' ) {
     console.log('******* QYRUS Cloud - INPUT PARAMETERS *******');
-    console.log('App Path :',appPath);
     console.log('Username :',qyrus_username);
     console.log('Password :',qyrus_password);
     console.log('Team Name :',qyrus_team_name);
@@ -59,45 +49,10 @@ if ( enable_debug == 'yes' ) {
     console.log('emailId :',emailId);
     console.log('Host Name :',host_name);
     console.log('Port :',port);
-    console.log('Path Name :',pathName);
-    console.log('Upload App :',upload_app);
     console.log('Browser :',browser);
 }
 
-var appName = '';
-//upload the app
-if ( upload_app === 'yes' ) {
-    if ( fs.existsSync(appPath) ) {
-        request.post({
-            url: gatewayUrl+pathName+"/uploadApp",
-            formData: {
-                file: fs.createReadStream(appPath),
-                uploadUserName: qyrus_username,
-                uploadEncodedPassword: qyrus_password,
-                teamName: qyrus_team_name,
-                projectName: qyrus_project_name
-            },
-        }, function(error, response, body) {
-            if (response.statusCode!=200) {
-                console.log('Failed to upload app! Try again.');
-                return;
-            } else {
-            //get the appName
-            appName = path.parse(appPath).base;
-            console.log("App - "+appName+" uploaded to Qyrus successfully!");
-            
-            //trigget the run
-            runTrigger();
-            }
-        });
-    } else {
-        console.log('App not found in artifacts!');
-        return;
-    }
-} else {
-    appName = path.parse(appPath).base;
-    runTrigger();
-} 
+runTrigger();
 
 //Test trigger method
 function runTrigger ( ) {
@@ -121,8 +76,8 @@ function runTrigger ( ) {
         "browser": browser,
         "onErrorContinue": onErrorContinue,
         "variableEnvironmentId": variableName
-
     }
+
     var reqPost = https.request ( apiCallConfig, function(response) {
         if (response.statusCode != 200) {
             console.log("Failed to run test, Try again.");

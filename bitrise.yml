@@ -4,9 +4,9 @@ default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 app:
   envs:
   # If you want to share this step into a StepLib
-  - BITRISE_STEP_ID: qyrus-web-test-runner-android
-  - BITRISE_STEP_VERSION: "0.0.3"
-  - BITRISE_STEP_GIT_CLONE_URL: https://github.com/QQyrus/qyrus-web-test-runner-android.git
+  - BITRISE_STEP_ID: qyrus-web-test-runner
+  - BITRISE_STEP_VERSION: "0.0.1"
+  - BITRISE_STEP_GIT_CLONE_URL: https://github.com/QQyrus/qyrus-web-test-runner.git
   - MY_STEPLIB_REPO_FORK_GIT_URL: https://github.com/QQyrus/bitrise-steplib.git
   
 workflows:
@@ -28,27 +28,22 @@ workflows:
     - path::./:
         title: Trigger Web Run On Qyrus
         description: |-
-          Uploads an APK/IPA file to Qyrus Cloud, triggers test run on
-          real device. To test this you will need valid Qyrus username
+          Triggers web test on Qyrus,
+          To test this you will need valid Qyrus username
           and password. else, you could ask support@qyrus.com.
         run_if: true
         inputs:
         - gateway_url: $GATEWAY_URL
-        - upload_path: $UPLOAD_PATH
         - qyrus_username: $QYRUS_USERNAME
         - qyrus_password: $QYRUS_PASSWORD
         - qyrus_team_name: $QYRUS_TEAM_NAME
         - qyrus_project_name: $QYRUS_PROJECT_NAME
         - qyrus_suite_name: $QYRUS_SUITE_NAME
-        - variableName: $VARIABLE_NAME
-        - OperatingSystem: $OPERATING_SYSTEM
-        - emailId: $EMAIL_ID
-        - browser: $BROWSER
-        - app_activity: $APP_ACTIVITY
-        - bundle_id: $BUNDLE_ID
+        - environment_name: $ENVIRONMENT_NAME
+        - operating_system: $OPERATING_SYSTEM
+        - email_id: $EMAIL_ID
+        - browser_name: $BROWSER_NAME
         - enable_debug: $DEBUG_MODE
-        - upload_app: $UPLOAD_APP
-        
 
     - script:
         inputs:
